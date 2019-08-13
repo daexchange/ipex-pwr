@@ -90,7 +90,7 @@ public class EthWatcher extends Watcher {
 	}
 
 	/**
-	 * 注册成功后的操作
+	 * 充值成功后的操作
 	 */
 	public void afterDeposit(Deposit deposit) {
 		executorService.execute(new Runnable() {
