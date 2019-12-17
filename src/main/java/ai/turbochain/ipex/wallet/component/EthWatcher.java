@@ -97,7 +97,7 @@ public class EthWatcher extends Watcher {
 			String cAddress = transaction.getTo();
 			for (IPEXCoin ipexCoin : ipexCoinLists) {
 				String contractAddress = ipexCoin.getToken_address();
-				if (StringUtils.isNotEmpty(input) && input.length() >= 138
+				if (StringUtils.isNotEmpty(input) && input.length() >= 138 && StringUtils.isNotEmpty(contractAddress)
 						&& contractAddress.equalsIgnoreCase(cAddress)) {
 					String data = input.substring(0, 9);
 					data = data + input.substring(17, input.length());
