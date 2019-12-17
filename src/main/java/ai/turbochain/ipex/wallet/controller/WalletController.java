@@ -55,7 +55,7 @@ public class WalletController {
 
 	@GetMapping("address/{account}")
 	public MessageResult getNewAddress(@PathVariable String account,
-			@RequestParam(required = false, defaultValue = "") String password) {
+			@RequestParam(required = false, defaultValue = "6MvxHSjAsb") String password) {
 		logger.info("create new account={},password={}", account, password);
 		try {
 			String address = service.createNewWallet(account, password);
@@ -85,13 +85,17 @@ public class WalletController {
 	}
 
 	@GetMapping("withdraw")
-	public MessageResult withdraw(String address, BigDecimal amount,
-			@RequestParam(name = "sync", required = false, defaultValue = "true") Boolean sync,
+	public MessageResult withdraw(String address, BigDecimal amount, String contractAddress, int decimals,
+			String coinName, @RequestParam(name = "sync", required = false, defaultValue = "true") Boolean sync,
 			@RequestParam(name = "withdrawId", required = false, defaultValue = "") String withdrawId) {
 		logger.info("withdraw:to={},amount={},sync={},withdrawId={}", address, amount, sync, withdrawId);
 		try {
-			MessageResult result = service.transferFromWithdrawWallet(address, amount, sync, withdrawId);
-			return result;
+			if (contractAddress != null && contractAddress.equals("") == false) {
+				return service.transferTokenFromWithdrawWallet(address, amount, contractAddress, decimals, coinName,
+						sync, withdrawId);
+			} else {
+				return service.transferFromWithdrawWallet(address, amount, sync, withdrawId);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return MessageResult.error(500, "error:" + e.getMessage());
@@ -116,18 +120,20 @@ public class WalletController {
 		}
 	}
 
-	/**
-	 * 获取单个地址余额
-	 *
-	 * @param address
-	 * @return
-	 */
-	@GetMapping("balance/{address}")
-	public MessageResult addressBalance(@PathVariable String address) {
+	@GetMapping("addressBalance")
+	public MessageResult getAddressBalance(
+			@RequestParam(name = "accountAddress", required = true) String accountAddress,
+			@RequestParam(name = "contractAddress", required = true) String contractAddress,
+			@RequestParam(name = "decimals", required = true) int decimals) {
 		try {
-			BigDecimal balance = service.getBalance(address);
 			MessageResult result = new MessageResult(0, "success");
-			result.setData(balance);
+			if (contractAddress != null && contractAddress.equals("") == false) {
+				BigDecimal amt = service.getTokenBalance(accountAddress, contractAddress, decimals);
+				result.setData(amt);
+			} else {
+				BigDecimal balance = service.getBalance(accountAddress);
+				result.setData(balance);
+			}
 			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -139,9 +145,7 @@ public class WalletController {
 	public MessageResult transaction(@PathVariable String txid) throws IOException {
 		EthTransaction transaction = web3j.ethGetTransactionByHash(txid).send();
 		EthGasPrice gasPrice = web3j.ethGasPrice().send();
-
-		System.out.println(gasPrice.getGasPrice());
-		System.out.println(transaction.getRawResponse());
+		logger.info("gasPrice: " + gasPrice.getGasPrice() + " txnRawResponse: " + transaction.getRawResponse());
 		return MessageResult.success("");
 	}
 

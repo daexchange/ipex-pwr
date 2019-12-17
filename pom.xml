@@ -54,10 +54,40 @@
             <version>1.3.4</version>
         </dependency>
         <dependency>
-            <groupId>ai.turbochain.ipex</groupId>
-            <artifactId>ipex-pwr-support</artifactId>
+        	<groupId>ai.turbochain.ipex</groupId>
+            <artifactId>ipex-rpc-common</artifactId>
             <version>1.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.briandilley.jsonrpc4j</groupId>
+            <artifactId>jsonrpc4j</artifactId>
+            <version>1.4.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mashape.unirest</groupId>
+            <artifactId>unirest-java</artifactId>
+            <version>1.4.9</version>
+        </dependency>
+        <!-- 数据库连接池 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid-spring-boot-starter</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
+		</dependency>
     </dependencies>
     <build>
         <finalName>ipex-pwr</finalName>
