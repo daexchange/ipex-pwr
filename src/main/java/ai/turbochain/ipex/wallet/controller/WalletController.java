@@ -85,8 +85,11 @@ public class WalletController {
 	}
 
 	@GetMapping("withdraw")
-	public MessageResult withdraw(String address, BigDecimal amount, String contractAddress, int decimals,
-			String coinName, @RequestParam(name = "sync", required = false, defaultValue = "true") Boolean sync,
+	public MessageResult withdraw(String address, BigDecimal amount,
+			@RequestParam(name = "contractAddress", required = false, defaultValue = "") String contractAddress,
+			@RequestParam(name = "decimals", required = false, defaultValue = "18") int decimals,
+			@RequestParam(name = "coinName", required = false, defaultValue = "") String coinName,
+			@RequestParam(name = "sync", required = false, defaultValue = "true") Boolean sync,
 			@RequestParam(name = "withdrawId", required = false, defaultValue = "") String withdrawId) {
 		logger.info("withdraw:to={},amount={},sync={},withdrawId={}", address, amount, sync, withdrawId);
 		try {
