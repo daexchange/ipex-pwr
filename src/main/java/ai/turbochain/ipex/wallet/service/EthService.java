@@ -74,10 +74,10 @@ public class EthService {
 		accountService.updateBalance(address, balance);
 	}
 
-	public MessageResult transferFromWithdrawWallet(String toAddress, BigDecimal amount, boolean sync,
-			String withdrawId) {
-		return transfer(coin.getKeystorePath() + "/" + coin.getWithdrawWallet(), coin.getWithdrawWalletPassword(),
-				toAddress, amount, sync, withdrawId);
+	public MessageResult transferFromWithdrawWallet(String password, Account account, String toAddress,
+			BigDecimal amount, boolean sync, String withdrawId) {
+		return transfer(coin.getKeystorePath() + "/" + account.getWalletFile(), password, toAddress, amount, sync,
+				withdrawId);
 	}
 
 	public MessageResult transfer(String walletFile, String password, String toAddress, BigDecimal amount, boolean sync,
@@ -167,13 +167,12 @@ public class EthService {
 		}
 	}
 
-	public MessageResult transferTokenFromWithdrawWallet(String toAddress, BigDecimal amount, String contractAddress,
-			int decimals, String coinName, boolean sync, String withdrawId) {
+	public MessageResult transferTokenFromWithdrawWallet(String password, Account account, String toAddress,
+			BigDecimal amount, String contractAddress, int decimals, String coinName, boolean sync, String withdrawId) {
 		Credentials credentials;
 		try {
 			// 解锁提币钱包
-			credentials = WalletUtils.loadCredentials(coin.getWithdrawWalletPassword(),
-					coin.getKeystorePath() + "/" + coin.getWithdrawWallet());
+			credentials = WalletUtils.loadCredentials(password, coin.getKeystorePath() + "/" + account.getWalletFile());
 		} catch (IOException e) {
 			e.printStackTrace();
 			return new MessageResult(500, "私钥文件不存在");

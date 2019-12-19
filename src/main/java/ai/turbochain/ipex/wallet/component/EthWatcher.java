@@ -158,10 +158,10 @@ public class EthWatcher extends Watcher {
 				logger.info("{}手续费不足，转账" + coin.getUnit() + "到充值账户作为手续费:from={},to={},amount={},sync={}",
 						deposit.getAddress(), coin.getWithdrawAddress(), deposit.getAddress(), fee, true);
 			}
-			logger.info("充值代币" + coinName + "转账到withdraw账户:from={},to={},amount={},sync={},withdrawId={}",
+			/*logger.info("充值代币" + coinName + "转账到withdraw账户:from={},to={},amount={},sync={},withdrawId={}",
 					deposit.getAddress(), coin.getWithdrawAddress(), deposit.getAmount(), true, "");
 			ethService.transferToken("6MvxHSjAsb", deposit.getAddress(), coin.getWithdrawAddress(), deposit.getAmount(),
-					contractAddress, decimals, coinName, true);
+					contractAddress, decimals, coinName, true);*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -188,7 +188,7 @@ public class EthWatcher extends Watcher {
 				deposit.setBlockHash(transaction.getBlockHash());
 				deposit.setAmount(Convert.fromWei(transaction.getValue().toString(), Convert.Unit.ETHER));
 				deposit.setAddress(transaction.getTo());
-				afterPwrDeposit(deposit);
+				//afterPwrDeposit(deposit);
 				deposits.add(deposit);
 				logger.info("received coin {} at height {}", transaction.getValue(), transaction.getBlockNumber());
 				// 同步余额
