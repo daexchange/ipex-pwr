@@ -102,7 +102,7 @@ public class PaymentHandler {
 			RawTransaction rawTransaction = RawTransaction.createEtherTransaction(nonce, gasPrice, maxGas,
 					payment.getTo(), value);
 
-			byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, payment.getCredentials());
+			byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, 136, payment.getCredentials());
 			String hexValue = Numeric.toHexString(signedMessage);
 			EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).sendAsync().get();
 			String transactionHash = ethSendTransaction.getTransactionHash();
@@ -127,7 +127,7 @@ public class PaymentHandler {
 	public static void main(String[] args) {
 		System.out.println(Convert.toWei("2", Convert.Unit.ETHER).toBigInteger());
 	}
-	
+
 	public MessageResult transferToken(Payment payment) {
 		try {
 			EthGetTransactionCount ethGetTransactionCount = web3j
@@ -135,7 +135,8 @@ public class PaymentHandler {
 					.sendAsync().get();
 			BigInteger nonce = ethGetTransactionCount.getTransactionCount();
 			BigInteger gasPrice = ethService.getGasPrice();
-			BigInteger value = payment.getAmount().multiply(new BigDecimal("10").pow(payment.getDecimals())).toBigInteger();
+			BigInteger value = payment.getAmount().multiply(new BigDecimal("10").pow(payment.getDecimals()))
+					.toBigInteger();
 			Function fn = new Function("transfer", Arrays.asList(new Address(payment.getTo()), new Uint256(value)),
 					Collections.<TypeReference<?>>emptyList());
 			String data = FunctionEncoder.encode(fn);
@@ -144,7 +145,7 @@ public class PaymentHandler {
 					payment.getCredentials().getAddress(), value, gasPrice, maxGas, nonce, payment.getTo());
 			RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, gasPrice, maxGas,
 					payment.getContractAddress(), data);
-			byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, payment.getCredentials());
+			byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, 136, payment.getCredentials());
 			String hexValue = Numeric.toHexString(signedMessage);
 			logger.info("hexRawValue={}", hexValue);
 			EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).sendAsync().get();
