@@ -19,6 +19,7 @@ import org.web3j.protocol.core.methods.response.EthTransaction;
 import org.web3j.utils.Convert;
 
 import ai.turbochain.ipex.wallet.component.EthWatcher;
+import ai.turbochain.ipex.wallet.entity.Account;
 import ai.turbochain.ipex.wallet.entity.Coin;
 import ai.turbochain.ipex.wallet.service.AccountService;
 import ai.turbochain.ipex.wallet.service.EthService;
@@ -85,7 +86,7 @@ public class WalletController {
 	}
 
 	@GetMapping("withdraw")
-	public MessageResult withdraw(String address, BigDecimal amount,
+	public MessageResult withdraw(String username, String address, BigDecimal amount,
 			@RequestParam(name = "contractAddress", required = false, defaultValue = "") String contractAddress,
 			@RequestParam(name = "decimals", required = false, defaultValue = "18") int decimals,
 			@RequestParam(name = "coinName", required = false, defaultValue = "") String coinName,
@@ -93,11 +94,15 @@ public class WalletController {
 			@RequestParam(name = "withdrawId", required = false, defaultValue = "") String withdrawId) {
 		logger.info("withdraw:to={},amount={},sync={},withdrawId={}", address, amount, sync, withdrawId);
 		try {
+			Account account = accountService.findByName(username);
+			if (account == null) {
+				return MessageResult.error(500, "用户名不存在:" + username);
+			}
 			if (contractAddress != null && contractAddress.equals("") == false) {
-				return service.transferTokenFromWithdrawWallet(address, amount, contractAddress, decimals, coinName,
-						sync, withdrawId);
+				return service.transferTokenFromWithdrawWallet("6MvxHSjAsb", account, address, amount, contractAddress,
+						decimals, coinName, sync, withdrawId);
 			} else {
-				return service.transferFromWithdrawWallet(address, amount, sync, withdrawId);
+				return service.transferFromWithdrawWallet("6MvxHSjAsb", account, address, amount, sync, withdrawId);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
