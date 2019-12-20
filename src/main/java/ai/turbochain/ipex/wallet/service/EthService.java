@@ -121,6 +121,7 @@ public class EthService {
 			logger.info(messageResult.toString());
 			return messageResult;
 		}
+		String txnHashString = "";
 		BigDecimal transferredAmount = BigDecimal.ZERO;
 		for (Account account : accounts) {
 			BigDecimal realAmount = account.getBalance().subtract(fee);
@@ -133,6 +134,7 @@ public class EthService {
 				logger.info("transfer address={},amount={},txid={}", account.getAddress(), realAmount,
 						result.getData());
 				transferredAmount = transferredAmount.add(realAmount);
+				txnHashString = txnHashString + (String) result.getData() + ",";
 				try {
 					syncAddressBalance(account.getAddress());
 				} catch (Exception e) {
@@ -144,7 +146,7 @@ public class EthService {
 			}
 		}
 		MessageResult result = new MessageResult(0, "success");
-		result.setData(transferredAmount);
+		result.setData(txnHashString.substring(0, txnHashString.length() - 1));
 		return result;
 	}
 
@@ -168,7 +170,7 @@ public class EthService {
 			return new MessageResult(0, "提交成功");
 		}
 	}
-	
+
 	public MessageResult transferTokenFromWallet(String password, String toAddress, BigDecimal amount,
 			String contractAddress, int decimals, String coinName, boolean sync, BigDecimal minAmount, BigDecimal fee) {
 		logger.info("transferTokenFromWallet 方法");
@@ -191,6 +193,7 @@ public class EthService {
 			return messageResult;
 		}
 		BigDecimal transferredAmount = BigDecimal.ZERO;
+		String txnHashString = "";
 		for (Account account : hasBalanceAccounts) {
 			BigDecimal realAmount = account.getBalance().subtract(fee);
 			if (realAmount.compareTo(amount.subtract(transferredAmount)) > 0) {
@@ -202,6 +205,7 @@ public class EthService {
 				logger.info("transfer address={},amount={},txid={}", account.getAddress(), realAmount,
 						result.getData());
 				transferredAmount = transferredAmount.add(realAmount);
+				txnHashString = txnHashString + (String) result.getData() + ",";
 				try {
 					syncAddressBalance(account.getAddress());
 				} catch (Exception e) {
@@ -213,7 +217,7 @@ public class EthService {
 			}
 		}
 		MessageResult result = new MessageResult(0, "success");
-		result.setData(transferredAmount);
+		result.setData(txnHashString.substring(0, txnHashString.length() - 1));
 		return result;
 	}
 
