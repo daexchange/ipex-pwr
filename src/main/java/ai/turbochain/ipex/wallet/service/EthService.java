@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -111,11 +112,12 @@ public class EthService {
 		return new BigDecimal(baseGasPrice).multiply(coin.getGasSpeedUp()).toBigInteger();
 	}
 
-	public MessageResult transferFromWallet(String address, BigDecimal amount, BigDecimal fee, BigDecimal minAmount) {
+	public MessageResult transferFromWallet(String password, String address, BigDecimal amount, BigDecimal fee,
+			BigDecimal minAmount) {
 		logger.info("transferFromWallet 方法");
 		List<Account> accounts = accountService.findByBalance(minAmount);
 		if (accounts == null || accounts.size() == 0) {
-			MessageResult messageResult = new MessageResult(500, "没有满足条件的转账账户(大于0.1)!");
+			MessageResult messageResult = new MessageResult(500, "没有满足条件的转账账户(大于0.001)!");
 			logger.info(messageResult.toString());
 			return messageResult;
 		}
@@ -125,7 +127,7 @@ public class EthService {
 			if (realAmount.compareTo(amount.subtract(transferredAmount)) > 0) {
 				realAmount = amount.subtract(transferredAmount);
 			}
-			MessageResult result = transfer(coin.getKeystorePath() + "/" + account.getWalletFile(), "", address,
+			MessageResult result = transfer(coin.getKeystorePath() + "/" + account.getWalletFile(), password, address,
 					realAmount, true, "");
 			if (result.getCode() == 0 && result.getData() != null) {
 				logger.info("transfer address={},amount={},txid={}", account.getAddress(), realAmount,
@@ -165,6 +167,54 @@ public class EthService {
 			paymentHandler.transferTokenAsync(credentials, toAddress, amount, contractAddress, decimals, coinName, "");
 			return new MessageResult(0, "提交成功");
 		}
+	}
+	
+	public MessageResult transferTokenFromWallet(String password, String toAddress, BigDecimal amount,
+			String contractAddress, int decimals, String coinName, boolean sync, BigDecimal minAmount, BigDecimal fee) {
+		logger.info("transferTokenFromWallet 方法");
+		List<Account> hasBalanceAccounts = new ArrayList<Account>();
+		List<Account> accounts = accountService.findAll();
+		for (Account account : accounts) {
+			try {
+				BigDecimal balance = this.getTokenBalance(account.getAddress(), contractAddress, decimals);
+				if (balance.compareTo(minAmount) >= 0) {
+					account.setBalance(balance);
+					hasBalanceAccounts.add(account);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (hasBalanceAccounts == null || hasBalanceAccounts.size() == 0) {
+			MessageResult messageResult = new MessageResult(500, "没有满足条件的转账账户(大于0.001)!");
+			logger.info(messageResult.toString());
+			return messageResult;
+		}
+		BigDecimal transferredAmount = BigDecimal.ZERO;
+		for (Account account : hasBalanceAccounts) {
+			BigDecimal realAmount = account.getBalance().subtract(fee);
+			if (realAmount.compareTo(amount.subtract(transferredAmount)) > 0) {
+				realAmount = amount.subtract(transferredAmount);
+			}
+			MessageResult result = transferToken(password, account.getAddress(), toAddress, amount, contractAddress,
+					decimals, coinName, sync);
+			if (result.getCode() == 0 && result.getData() != null) {
+				logger.info("transfer address={},amount={},txid={}", account.getAddress(), realAmount,
+						result.getData());
+				transferredAmount = transferredAmount.add(realAmount);
+				try {
+					syncAddressBalance(account.getAddress());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			if (transferredAmount.compareTo(amount) >= 0) {
+				break;
+			}
+		}
+		MessageResult result = new MessageResult(0, "success");
+		result.setData(transferredAmount);
+		return result;
 	}
 
 	public MessageResult transferTokenFromWithdrawWallet(String password, Account account, String toAddress,
