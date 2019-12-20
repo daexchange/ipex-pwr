@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>ipex-pwr</artifactId>
+    <artifactId>ipex-ete</artifactId>
     <version>1.0.1</version>
     <parent>
         <artifactId>ipex-wallet-rpc</artifactId>
@@ -90,7 +90,7 @@
 		</dependency>
     </dependencies>
     <build>
-        <finalName>ipex-pwr</finalName>
+        <finalName>ipex-ete</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
