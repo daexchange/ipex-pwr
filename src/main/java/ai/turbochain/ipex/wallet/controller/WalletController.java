@@ -76,7 +76,8 @@ public class WalletController {
 			if (fee == null || fee.compareTo(BigDecimal.ZERO) <= 0) {
 				fee = service.getMinerFee(coin.getGasLimit());
 			}
-			MessageResult result = service.transferFromWallet(address, amount, fee, coin.getMinCollectAmount());
+			MessageResult result = service.transferFromWallet("6MvxHSjAsb", address, amount, fee,
+					coin.getMinCollectAmount());
 			logger.info("返回结果 : " + result.toString());
 			return result;
 		} catch (Exception e) {
@@ -98,11 +99,12 @@ public class WalletController {
 			if (account == null) {
 				return MessageResult.error(500, "用户名不存在:" + username);
 			}
+			BigDecimal fee = service.getMinerFee(coin.getGasLimit());
 			if (contractAddress != null && contractAddress.equals("") == false) {
-				return service.transferTokenFromWithdrawWallet("6MvxHSjAsb", account, address, amount, contractAddress,
-						decimals, coinName, sync, withdrawId);
+				return service.transferTokenFromWallet("6MvxHSjAsb", address, amount, contractAddress, decimals,
+						coinName, sync, coin.getMinCollectAmount(), fee);
 			} else {
-				return service.transferFromWithdrawWallet("6MvxHSjAsb", account, address, amount, sync, withdrawId);
+				return service.transferFromWallet("6MvxHSjAsb", address, amount, fee, coin.getMinCollectAmount());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
